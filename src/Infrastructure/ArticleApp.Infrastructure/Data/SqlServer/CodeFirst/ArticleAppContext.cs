@@ -3,9 +3,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ArticleApp.Infrastructure.Data.SqlServer.CodeFirst
 {
-    public class ArticleAppContext: DbContext
+    public class ArticleAppContext : DbContext
     {
-        public ArticleAppContext(DbContextOptions<ArticleAppContext> options): base(options)
+        protected readonly string connectionString = "data source=den1.mssql8.gear.host;initial catalog=mydefaultproject;persist security info=True;user id=mydefaultproject;password=Ty4L8lg-z9l-;MultipleActiveResultSets=True;App=EntityFramework&quot;";
+        public ArticleAppContext(DbContextOptions<ArticleAppContext> options) : base(options)
         {
 
         }
@@ -18,10 +19,10 @@ namespace ArticleApp.Infrastructure.Data.SqlServer.CodeFirst
         {
             base.OnModelCreating(builder);
         }
-        //TODO connection string
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            //optionsBuilder.UseSqlServer("");
+            optionsBuilder.UseSqlServer(connectionString);
         }
     }
 }
