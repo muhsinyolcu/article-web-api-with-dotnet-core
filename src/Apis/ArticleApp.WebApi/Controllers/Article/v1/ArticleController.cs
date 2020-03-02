@@ -2,12 +2,10 @@
 using ArticleApp.WebApi.Dtos;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
-using System;
 using System.Threading.Tasks;
 
 namespace ArticleApp.WebApi.Controllers.Article.v1
 {
-    //TODO
     [ApiVersion("1.0")]
     [Route("api/v{version:apiVersion}/[controller]")]
     public class ArticleController : BaseApiController
@@ -19,10 +17,6 @@ namespace ArticleApp.WebApi.Controllers.Article.v1
             _articleService = articleService;
             _mapper = mapper;
         }
-        public IActionResult Index()
-        {
-            return Ok();
-        }
 
         [HttpGet()]
         [Route("getallarticles")]
@@ -31,6 +25,15 @@ namespace ArticleApp.WebApi.Controllers.Article.v1
             var articles = await _articleService.ListAllAsync();
 
             return HttpEntity(articles);
+        }
+
+        [HttpGet()]
+        [Route("deletearticle/{id}")]
+        public async Task<IActionResult> DeleteArticle([FromRoute] int id)
+        {
+            var result = await _articleService.DeleteAsync(id);
+
+            return HttpEntity(result);
         }
 
         [HttpPost()]
@@ -43,16 +46,6 @@ namespace ArticleApp.WebApi.Controllers.Article.v1
             }
             var entity = _mapper.Map<Infrastructure.Entities.Article>(article);
             var result = await _articleService.AddAsync(entity);
-
-            return HttpEntity(result);
-        }
-
-
-        [HttpGet()]
-        [Route("deletearticle/{id}")]
-        public async Task<IActionResult> DeleteArticle([FromRoute] string id)
-        {
-            var result = await _articleService.DeleteAsync(Convert.ToInt32(id));
 
             return HttpEntity(result);
         }

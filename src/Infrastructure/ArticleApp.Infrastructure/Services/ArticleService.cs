@@ -30,7 +30,7 @@ namespace ArticleApp.Infrastructure.Services
                 if (result > decimal.Zero)
                     serviceResult.Result = entity;
                 else
-                    serviceResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
+                    serviceResult.ErrorCode = (int)ErrorCodeEnum.BadRequest;
             }
             catch (Exception ex)
             {
@@ -42,9 +42,37 @@ namespace ArticleApp.Infrastructure.Services
             return serviceResult;
         }
 
-        public Task<ServiceResult<int>> DeleteAsync(int id)
+        public async Task<ServiceResult<int>> DeleteAsync(int id)
         {
-            throw new System.NotImplementedException();
+            var serviceResult = new ServiceResult<int>();
+            try
+            {
+                var article = await _dbContext.Set<Article>().FirstOrDefaultAsync(a => a.Id == id);
+                if (article != null)
+                {
+                    _dbContext.Set<Article>().Remove(article);
+                    var result = await _dbContext.SaveChangesAsync();
+
+                    if (result > decimal.Zero)
+                        serviceResult.Result = result;
+                    else
+                        serviceResult.ErrorCode = (int)ErrorCodeEnum.BadRequest;
+                }
+                else
+                {
+                    serviceResult.HasError = true;
+                    serviceResult.ErrorCode = (int)ErrorCodeEnum.BadRequest;
+                    serviceResult.ValidationMessages.Add("Article not found");
+                }
+            }
+            catch (Exception ex)
+            {
+                serviceResult.HasError = true;
+                serviceResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
+                serviceResult.ValidationMessages.Add(ex.Message);
+                //LOG
+            }
+            return serviceResult;
         }
 
         public async Task<ServiceResult<IReadOnlyList<Article>>> ListAllAsync()
@@ -69,9 +97,27 @@ namespace ArticleApp.Infrastructure.Services
             return serviceResult;
         }
 
-        public Task<ServiceResult<Article>> UpdateAsync(Article entity)
+        public async Task<ServiceResult<Article>> UpdateAsync(Article entity)
         {
-            throw new System.NotImplementedException();
+            var serviceResult = new ServiceResult<Article>();
+            try
+            {
+                _dbContext.Entry(entity).State = EntityState.Modified;
+                var result = await _dbContext.SaveChangesAsync();
+
+                if (result > decimal.Zero)
+                    serviceResult.Result = entity;
+                else
+                    serviceResult.ErrorCode = (int)ErrorCodeEnum.BadRequest;
+            }
+            catch (Exception ex)
+            {
+                serviceResult.HasError = true;
+                serviceResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
+                serviceResult.ValidationMessages.Add(ex.Message);
+                //LOG
+            }
+            return serviceResult;
         }
     }
 }
