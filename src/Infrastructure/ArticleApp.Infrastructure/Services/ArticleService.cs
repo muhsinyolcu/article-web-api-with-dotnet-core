@@ -19,9 +19,27 @@ namespace ArticleApp.Infrastructure.Services
         {
             _dbContext = dbContext;
         }
-        public Task<ServiceResult<Article>> AddAsync(Article entity)
+        public async Task<ServiceResult<Article>> AddAsync(Article entity)
         {
-            throw new System.NotImplementedException();
+            var serviceResult = new ServiceResult<Article>();
+            try
+            {
+                _dbContext.Set<Article>().Add(entity);
+                var result = await _dbContext.SaveChangesAsync();
+
+                if (result > decimal.Zero)
+                    serviceResult.Result = entity;
+                else
+                    serviceResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
+            }
+            catch (Exception ex)
+            {
+                serviceResult.HasError = true;
+                serviceResult.ErrorCode = (int)ErrorCodeEnum.SystemException;
+                serviceResult.ValidationMessages.Add(ex.Message);
+                //LOG
+            }
+            return serviceResult;
         }
 
         public Task<ServiceResult<int>> DeleteAsync(int id)

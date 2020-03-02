@@ -8,7 +8,7 @@ namespace ArticleApp.Infrastructure.Entities
         public int UserId { get; set; }
         public string CommentContent { get; set; }
         public DateTime CreateDate { get; set; }
-        public DateTime UpdateDate { get; set; }
+        public DateTime? UpdateDate { get; set; }
         public bool IsActive { get; set; }
         public bool IsDeleted { get; set; }
     }

@@ -2,6 +2,8 @@ using ArticleApp.Infrastructure.Data;
 using ArticleApp.Infrastructure.Data.SqlServer.CodeFirst;
 using ArticleApp.Infrastructure.Interfaces;
 using ArticleApp.Infrastructure.Services;
+using ArticleApp.WebApi.Helpers;
+using AutoMapper;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -27,6 +29,14 @@ namespace ArticleApp.WebApi
 
             services.AddScoped(typeof(IAsyncRepository<>), typeof(EfRepository<>));
             services.AddScoped<IArticleService, ArticleService>();
+            //Auto Mapper Configurations
+            var mappingConfig = new MapperConfiguration(mc =>
+            {
+                mc.AddProfile(new ArticleProfile());
+            });
+
+            IMapper mapper = mappingConfig.CreateMapper();
+            services.AddSingleton(mapper);
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
             services.AddApiVersioning(o => o.ApiVersionReader = new HeaderApiVersionReader("api-version"));
